@@ -12,7 +12,18 @@ export const app = exp();
 
 // add body parser middle ware
 app.use(exp.json());
-app.use(cors());
+const allowedOrigins = process.env.CLIENT_URL.split(',');
+
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, origin);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true
+}));
 
 // connecting api
 app.use('/user-api', userRoute); // fixed variables
