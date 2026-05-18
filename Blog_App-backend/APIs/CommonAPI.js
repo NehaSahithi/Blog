@@ -4,6 +4,19 @@ import { UserTypeModel } from "../Models/UserModel.js"; // Capital 'M'
 import bcrypt from "bcryptjs";
 
 export const commonRouter = exp.Router();
+// check auth status
+commonRouter.get("/check-auth", verifyToken, async (req, res) => {
+  try {
+    // verifyToken middleware should attach 'req.user' if the token is valid
+    const user = await UserTypeModel.findById(req.user.userId).select("-password");
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.status(200).json({ message: "Authenticated", payload: user });
+  } catch (error) {
+    res.status(401).json({ message: "Not authenticated" });
+  }
+});
 //login
 commonRouter.post("/login", async (req, res) => {
   //get user cred object
